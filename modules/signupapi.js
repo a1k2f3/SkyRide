@@ -1,7 +1,7 @@
 import express from "express";
 import bcrypt from "bcryptjs";
-import Accounts from "../Schema/Signup.js"; // Verify this path
-import validateSignup from "../middleware/MiddleWare.js";
+import Accounts from "../schema/user.js";
+ import validateSignup from "../middleware/MiddleWare.js";
 import multer from "multer";
 import path from "path";
 import fs from 'fs'
