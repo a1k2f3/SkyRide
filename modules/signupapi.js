@@ -5,7 +5,7 @@ import validateSignup from "../middleware/MiddleWare.js";
 import multer from "multer";
 import path from "path";
 import fs from 'fs'
-import nodemailer from 'nodemailer';
+// import nodemailer from 'nodemailer';
 import { Server } from "socket.io";
 const router = express.Router();
 router.use(express.static( 'public'));
@@ -46,7 +46,6 @@ router.post("/signup", upload.single('image'),validateSignup,async (req, res) =>
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    
     await Accounts.create({
       username,
       email,
