@@ -1,6 +1,6 @@
 import express from "express";
 import bcrypt from "bcryptjs";
-import Accounts from "../Schema/Signup.js"; // Verify this path
+import Accounts from "../schema/user.js"; // Verify this path
 import jwt from "jsonwebtoken";
 const router = express.Router();
 export default(io)=>{
@@ -18,7 +18,6 @@ router.post("/login", async (req, res) => {
     if (!existingUser) {
       return res.status(400).send("Invalid email or password");
     }
-    
     const validation = await bcrypt.compare(password, existingUser.password);
     if (!validation) {
       return res.status(400).send("Invalid email or password");

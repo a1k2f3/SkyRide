@@ -1,4 +1,5 @@
 // const express = require('express')
+import login from './modules/login.js'
 import express from 'express'
 import { createServer } from 'http' 
 import cors from 'cors'
@@ -14,6 +15,16 @@ Connection()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use('/api', signupapi)
+app.use(express.static('public'))
+const httpServer = createServer(app);
+import { Server } from 'socket.io';
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST','PUT','DELETE'],
+  },
+});
+app.use('/api', login(io))
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
