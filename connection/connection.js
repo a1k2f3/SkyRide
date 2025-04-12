@@ -11,7 +11,8 @@ const Connection = async () => {
     
 let data=await mongoose.connection.db.collection("Accounts").find({}).toArray()
 console.log(data)
-    console.log("Database connection successful");
+console.log("Database connection successful");
+return data;
   } catch (error) {
     console.error("Database connection failed:", error.message);
   }
