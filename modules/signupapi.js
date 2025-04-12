@@ -5,7 +5,7 @@ import Accounts from "../schema/user.js";
 import multer from "multer";
 import path from "path";
 import fs from 'fs'
-// import nodemailer from 'nodemailer';
+
 import { Server } from "socket.io";
 const router = express.Router();
 router.use(express.static( 'public'));

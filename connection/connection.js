@@ -7,8 +7,7 @@ const Connection = async () => {
     await mongoose.connect(dbUrl, {
       dbName: "skyrides", // Specify the database name
       useNewUrlParser: true, // This is still valid
-    });
-    
+    });    
 let data=await mongoose.connection.db.collection("Accounts").find({}).toArray()
 console.log(data)
 console.log("Database connection successful");
