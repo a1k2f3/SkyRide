@@ -35,9 +35,9 @@ export default(httpServer)=>{
 router.post("/signup", upload.single('image'),validateSignup,async (req, res) => {
 
   try {
-    const { username, email, phone, date_of_birth, password, country,Userbio } = req.body;
+    const { username, email, phone, date_of_birth, password, country,Userbio,role } = req.body;
     const file=req.file
-    if (!username || !email || !password) {
+    if (!username || !email || !password||!date_of_birth||!password||!country||role) {
       return res.status(400).json({ message: "Username, email, and password are required." });
     }
     const existingUser = await Accounts.findOne({ email });
@@ -54,7 +54,8 @@ router.post("/signup", upload.single('image'),validateSignup,async (req, res) =>
       password: hashedPassword,
       country,
       image:file?file.filename:null,
-      Userbio
+      Userbio,
+      role
     });
     io.emit("user signup",{emai:email, name:username})
   }  

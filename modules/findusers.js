@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import mongoose from "mongoose"; // Import mongoose
-import Accounts from "../schema/user.js"; // Adjust the path as per your project structure
+ // Adjust the path as per your project structure
 
 const router = express.Router();
 

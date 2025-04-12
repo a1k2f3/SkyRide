@@ -6,7 +6,7 @@ const Connection = async () => {
     const dbUrl = process.env.DATA_BASE_URL; // Use environment variable for the connection string
     await mongoose.connect(dbUrl, {
       dbName: "skyrides", // Specify the database name
-      useNewUrlParser: true, // This is still valid
+      // useNewUrlParser: true, // This is still valid
     });    
 let data=await mongoose.connection.db.collection("Accounts").find({}).toArray()
 console.log(data)
