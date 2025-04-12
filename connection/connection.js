@@ -1,12 +1,19 @@
 import mongoose from 'mongoose';
-
-// const dburl=process.env.DATA_BASE_URL
-const Connection=async()=>{
-try {
-    await mongoose.connect('mongodb+srv://akifbutt935:akif1234@cluster0.awqe4fp.mongodb.net/skyrides');
-  console.log("databsae cnnection succesfull")
-} catch (error) {
-    console.log(error);
-   }
-}
+import dotenv from 'dotenv';
+dotenv.config(); // Load environment variables from .env file
+const Connection = async () => {
+  try {
+    const dbUrl = process.env.DATA_BASE_URL; // Use environment variable for the connection string
+    await mongoose.connect(dbUrl, {
+      dbName: "skyrides", // Specify the database name
+      useNewUrlParser: true, // This is still valid
+    });
+    
+let data=await mongoose.connection.db.collection("Accounts").find({}).toArray()
+console.log(data)
+    console.log("Database connection successful");
+  } catch (error) {
+    console.error("Database connection failed:", error.message);
+  }
+};
 export default Connection;
