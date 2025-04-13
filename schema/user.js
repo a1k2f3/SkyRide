@@ -6,6 +6,7 @@ const SignupSchema = new Schema({
   phone: { type: Number },
   date_of_birth: { type: Date },
   password: { type: String, required: true },
+  confirmpassword: { type: String, required: true },
   country: { type: String },
   image: { type: String },
   Userbio: { type: String },
