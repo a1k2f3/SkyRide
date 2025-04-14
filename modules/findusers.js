@@ -1,11 +1,10 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
+import Accounts from "../schema/user.js"; // Adjust the path as per your project structure
 import mongoose from "mongoose"; // Import mongoose
  // Adjust the path as per your project structure
-
 const router = express.Router();
-
 // Get the correct __dirname (because you're using ES modules)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,12 +19,11 @@ router.get("/alluser", async (req, res) => {
 
   try {
     // Fetch paginated data
-    const data = await mongoose.connection.db
-      .collection("Accounts")
-      .find({})
+    const data = await Accounts.find()
       .skip((pageNumber - 1) * limitNumber)
       .limit(limitNumber)
-      .toArray();
+      .sort({ createdAt: -1 }) // Sort by createdAt field in descending order
+      .select("-password"); // Exclude password field
 
     // Get the total count of documents
     const count = await mongoose.connection.db

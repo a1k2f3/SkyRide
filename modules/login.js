@@ -43,5 +43,64 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-return router;
+router.put("/updateaccount/:id", async (req, res) => {
+  try {
+    const { username, email, password, role,phone } = req.body;
+    const file = req.file; // assuming you're using multer
+
+    // Basic validation
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required." });
+    }
+
+    const updateData = {
+      ...(username && { username }),
+      ...(email && { email }),
+      ...(password && { password }),
+      ...(role && { role }),
+      ...(phone && { phone }),
+      ...(file && { image: file.filename }),
+    };
+
+    const updatedAccount = await Accounts.findOneAndUpdate(
+      req.params.id,
+      { $set: updateData },
+      { new: true }
+    );
+    if (!updatedAccount) {
+      return res.status(404).json({ message: "Account not found." });
+    }
+    res.status(200).json({ message: "Account updated successfully.", account: updatedAccount });
+  } catch (error) {
+    console.error("Update error:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+router.get("/getaccount", async (req, res) => {
+  
+  try {
+    const { email } = req.body;
+    const account = await Accounts.findOne({email});
+    if (!account) {
+      return res.status(404).json({ message: "Account not found." });
+    }
+    res.status(200).json({ account });
+  } catch (error) {
+    console.error("Fetch error:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+router.delete("/deleteaccount/:id", async (req, res)  => {
+  try {
+    const { id } = req.params;
+    const deletedAccount = await Accounts.findByIdAndDelete(id);
+    if (!deletedAccount) {
+      return res.status(404).json({ message: "Account not found." });
+    }
+    res.status(200).json({ message: "Account deleted successfully." });
+  } catch (error) {
+    console.error("Delete error:", error);
+    res.status(500).json({ message: "Server error." });
+  }});
+  return router;
 }
