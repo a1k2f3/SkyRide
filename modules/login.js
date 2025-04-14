@@ -34,6 +34,7 @@ router.post("/login", async (req, res) => {
           id: existingUser.id,
           email: existingUser.email,
         });
+        console.log("User logged in", user.email);
       }
     }
 

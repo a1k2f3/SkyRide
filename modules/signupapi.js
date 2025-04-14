@@ -5,7 +5,6 @@ import validateSignup from "../middleware/MiddleWare.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { Server } from "socket.io";
 
 const router = express.Router();
 router.use(express.static("public"));
@@ -24,19 +23,10 @@ const storage = multer.diskStorage({
   },
 });
 
-export default (httpServer) => {
-  const io = new Server(httpServer);
-
-  io.on("connection", (socket) => {
-    console.log("User connected to Signup API");
-    socket.on("disconnect", () => {
-      console.log("User disconnected from Signup API");
-    });
-  });
-
+export default (io) => {
   const upload = multer({ storage });
 
-  router.post("/signup", upload.single("image"), validateSignup, async (req, res) => {
+  router.post('/signup', upload.single("image"), validateSignup, async (req, res) => {
     try {
       const { username, email, phone, date_of_birth, password, confirmpassword, country } = req.body;
       const file = req.file;
@@ -66,6 +56,7 @@ export default (httpServer) => {
         image: file ? file.filename : null,
       });
 
+      // 🔥 Broadcast signup to all connected clients
       io.emit("user signup", { email, name: username });
 
       res.status(201).json({ message: "Signup successful!" });
@@ -74,7 +65,5 @@ export default (httpServer) => {
       res.status(500).json({ message: "Server error." });
     }
   });
-
   return router;
 };
-// Note: Make sure to adjust the import paths according to your project structure.
