@@ -3,19 +3,16 @@ const onlineUsers = new Map();
 export default function setupSocket(io) {
   io.on("connection", (socket) => {
     console.log("🔌 New client connected:", socket.id);
-
     // Register user after login
     socket.on("register-user", (user) => {
       onlineUsers.set(socket.id, user);
       console.log("✅ Registered user:", user);
     });
-
     // User comes online
     socket.on("user-online", ({ id, email }) => {
       onlineUsers.set(socket.id, { id, email });
       socket.broadcast.emit("user-status", { id, status: "online" });
     });
-
     // User follows another
     socket.on("follow-user", (targetUserId) => {
       socket.join(`follow-${targetUserId}`);

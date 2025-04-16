@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 const router = express.Router();
 export default(io,onlineUsers)=>{
 router.post("/login", async (req, res) => {
-  try {
+  try { 
     const { email,password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required." });
@@ -14,12 +14,10 @@ router.post("/login", async (req, res) => {
     if (!existingUser) {
       return res.status(400).send("Invalid email or password");
     }
-    const validation = await bcrypt.compare(password, existingUser.password);
+    const validation = await bcrypt.compare(password,existingUser.password);
     if (!validation) {
       return res.status(400).send("Invalid email or password");
     }
-
-    // Generate JWT token
     const token = jwt.sign(
       { id: existingUser._id, email: existingUser.email },
       process.env.JWT_SECRET || "your_jwt_secret", // Replace with your secret
@@ -87,6 +85,27 @@ router.get("/getaccount", async (req, res) => {
     res.status(200).json({ account });
   } catch (error) {
     console.error("Fetch error:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+router.put("/updatepassword", async (req, res) => {
+  try {
+    const { password,email} = req.body;
+    if (!password) {
+      return res.status(400).json({ message: "Password is required." });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const updatedAccount = await Accounts.findOneAndUpdate(
+      {email},
+      { password: hashedPassword },
+      { new: true }
+    );
+    if (!updatedAccount) {
+      return res.status(404).json({ message: "Account not found." });
+    }
+    res.status(200).json({ message: "Password updated successfully." });
+  } catch (error) {
+    console.error("Update error:", error);
     res.status(500).json({ message: "Server error." });
   }
 });

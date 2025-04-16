@@ -30,7 +30,6 @@ app.use('/api', findusers);
 app.use('/api', userlocation(io));
 // Test Routes
 app.get('/', (req, res) => res.send('Hello World!'));
-app.get('/test', (req, res) => res.send('Testing endpoint'));
 // Centralized Socket Logic
 setupSocket(io);
 // Start Server
