@@ -16,12 +16,10 @@ const io = new Server(httpServer, {
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   },
 });
-// Setup middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-// Connect to DB
 Connection();
 // Use Routes
 app.use('/api', register(io));
@@ -32,7 +30,6 @@ app.use('/api', userlocation(io));
 app.get('/', (req, res) => res.send('Hello World!'));
 // Centralized Socket Logic
 setupSocket(io);
-// Start Server
 const port = 3000;
 httpServer.listen(port, () => {
   console.log(`🚀 Server running at http://localhost:${port}`);
