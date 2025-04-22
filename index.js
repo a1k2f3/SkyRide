@@ -6,6 +6,7 @@ import Connection from './connection/connection.js';
 import setupSocket, { onlineUsers } from './modules/SocketsMManegar.js';
 import login from './modules/login.js';
 import register from './modules/signupapi.js';
+import { Verify } from 'crypto';
 import findusers from './modules/findusers.js';
 import userlocation from './modules/userlocation.js';
 const app = express();
@@ -23,6 +24,7 @@ app.use(express.static('public'));
 Connection();
 // Use Routes
 app.use('/api', register(io));
+// app.use('/api', register(io));
 app.use('/api', login(io, onlineUsers));
 app.use('/api', findusers);
 app.use('/api', userlocation(io));
