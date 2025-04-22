@@ -33,7 +33,52 @@ export default function setupSocket(io) {
       onlineUsers.delete(socket.id);
       console.log("❌ Disconnected:", socket.id);
     });
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  // Join a private room based on userId and mechanicId
+  socket.on('join-room', ({ userId, mechanicId }) => {
+    const room = `room-${userId}-${mechanicId}`;
+    socket.join(room);
+    console.log(`${socket.id} joined room ${room}`);
   });
+
+  // Listen for messages and broadcast them to the correct room
+  socket.on('chat-message', ({ senderId, receiverId, message }) => {
+    const room = `room-${senderId}-${receiverId}`;
+    io.to(room).emit('receive-message', { senderId, message });
+    console.log(`Message sent to room ${room}: ${message}`);
+  });
+
+  // Disconnect event
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
+});
+console.log('A user connected:', socket.id);
+  
+    // Join a private room based on userId and mechanicId
+    socket.on('join-room', ({ userId, mechanicId }) => {
+      const room = `room-${userId}-${mechanicId}`;
+      socket.join(room);
+      console.log(`${socket.id} joined room ${room}`);
+    });
+  
+    // Listen for messages and broadcast them to the correct room
+    socket.on('chat-message', ({ senderId, receiverId, message }) => {
+      const room = `room-${senderId}-${receiverId}`;
+      io.to(room).emit('receive-message', { senderId, message });
+      console.log(`Message sent to room ${room}: ${message}`);
+    });
+  
+    // Disconnect event
+    socket.on('disconnect', () => {
+      console.log('A user disconnected');
+    });
+  })
+ 
 }
+
+
 
 export { onlineUsers };
