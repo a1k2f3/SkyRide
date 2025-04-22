@@ -9,6 +9,7 @@ import register from './modules/signupapi.js';
 import findusers from './modules/findusers.js';
 import userlocation from './modules/userlocation.js';
 import Chatroutes from './modules/chat/routes.js';
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -17,22 +18,28 @@ const io = new Server(httpServer, {
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   },
 });
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
+// Initialize Connection
 Connection();
+
 // Use Routes
-app.use('/api', register(io));
-// app.use('/api', register(io));
-app.use('/api', login(io, onlineUsers));
-app.use('/api', findusers);
-app.use('/api', userlocation(io));
-app.use('/api', Chatroutes(io));
+app.use('/api', register(io)); // Make sure the register function is returning a router
+app.use('/api', login(io, onlineUsers)); // Make sure the login function is returning a router
+app.use('/api', findusers); // Ensure this also returns an Express router
+app.use('/api', userlocation(io)); // Same for userlocation
+app.use('/api', Chatroutes); // Ensure Chatroutes returns a router
+
 // Test Routes
 app.get('/', (req, res) => res.send('Hello World!'));
+
 // Centralized Socket Logic
 setupSocket(io);
+
 const port = 3000;
 httpServer.listen(port, () => {
   console.log(`🚀 Server running at http://localhost:${port}`);
