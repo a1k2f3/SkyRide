@@ -10,6 +10,6 @@ const SignupSchema = new Schema({
   country: { type: String },
   image: { type: String },
   Userbio: { type: String },
-  role: {type: String, enum: ["machanic", "user"], default: "user"},
+  role: {type: String, enum: ["machanic", "user","fuel pump"], default: "user"},
 });
 export default mongoose.model("Accounts", SignupSchema);
