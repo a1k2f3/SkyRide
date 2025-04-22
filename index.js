@@ -18,6 +18,10 @@ const io = new Server(httpServer, {
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   },
 });
+app.use((req, res, next) => {
+  req.io = io; // attach io to every request
+  next();
+});
 
 app.use(cors());
 app.use(express.json());

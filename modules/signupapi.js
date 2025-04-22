@@ -54,8 +54,7 @@ export default (io) => {
       if (existingUser) {
         return res.status(400).json({ message: "Email already in use." });
       }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
+     const hashedPassword = await bcrypt.hash(password, 10);
 
       // Generate token and save user temporarily
       const token = crypto.randomBytes(32).toString("hex");

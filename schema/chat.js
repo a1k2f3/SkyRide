@@ -12,7 +12,7 @@ const messageSchema = new mongoose.Schema({
         required: true,  
       },
     message: String,
-    role: { type: String, required: true }, //
+    role: { type: String,required: true }, //
     timestamp: { type: Date, default: Date.now }
   });
   const Chats = mongoose.model('chats', messageSchema);
