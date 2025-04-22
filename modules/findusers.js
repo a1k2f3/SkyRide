@@ -16,7 +16,6 @@ router.get("/alluser", async (req, res) => {
   const { page = 1, limit = 10 } = req.query; // Default to page 1, 10 users per page
   const pageNumber = parseInt(page, 10);
   const limitNumber = parseInt(limit, 10);
-
   try {
     // Fetch paginated data
     const data = await Accounts.find()

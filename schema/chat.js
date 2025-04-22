@@ -1,7 +1,16 @@
 import mongoose from 'mongoose';
+import Accounts from "./user.js"; // Adjust the path as per your project structure
 const messageSchema = new mongoose.Schema({
-    senderId: String,
-    receiverId: String,
+    senderId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Accounts, 
+        required: true,  
+      },
+    receiverId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Accounts, 
+        required: true,  
+      },
     message: String,
     role: { type: String, required: true }, //
     timestamp: { type: Date, default: Date.now }

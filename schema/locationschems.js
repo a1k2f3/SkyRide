@@ -3,7 +3,7 @@ import Accounts from "./user.js"
 const locationSchema = new mongoose.Schema({
   senderId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Accounts", 
+    ref: Accounts, 
     required: true,  
   },
   latitude: {
