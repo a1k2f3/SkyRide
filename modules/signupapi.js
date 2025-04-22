@@ -36,9 +36,7 @@ export default (io) => {
         return res.status(400).json({ message: "Passwords do not match." });
       }
   
-      if (!email.endsWith("@gmail.com")) {
-        return res.status(400).json({ message: "Only Gmail accounts are accepted." });
-      }
+     
       const verifyUrl = `http://apilayer.net/api/check?access_key=3566824110ee2c3cd94dcfb4397597c2&email=${email}&smtp=1&format=1`;
 
       const response = await fetch(verifyUrl);
@@ -57,15 +55,16 @@ export default (io) => {
       const transporter = nodemailer.createTransport({
         service: "gmail",
         secure: true,
+        port: 465,
         auth: {
-          user: "akifbutt935@gmail.com",
-          pass: "kmev dssf mton xgdh"
+          user: process.env.EMAIL_USER, 
+          pass: "kmev dssf mton xgdh"  
         }
       });
-  
+    
       const mailOptions = {
-        from: "akifbutt935@gmail.com",
-        to: email,
+        from: "akifbutt935@gmail.com", // The sender's email (the user's email)
+        to: email, // Your email address
         subject: "Signup Confirmation - Welcome to Our Platform!",
         html: `
           <h2>Hi ${username},</h2>
@@ -77,6 +76,8 @@ export default (io) => {
           <p>Best regards,<br/>The Team</p>
         `
       };
+  // twilio
+     
   
       // Try sending email before creating account
       transporter.sendMail(mailOptions, async (err, info) => {
@@ -84,8 +85,6 @@ export default (io) => {
           console.error("Email failed to send:", err);
           return res.status(400).json({ message: "Invalid or unreachable Gmail address." });
         }
-        // 3566824110ee2c3cd94dcfb4397597c2
-        // Create account only if email sent successfully
         const newUser = new Accounts({
           username,
           email,
