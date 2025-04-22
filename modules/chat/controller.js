@@ -21,8 +21,8 @@ export const getChatHistory = async (req, res) => {
   try {
     const chatHistory = await Chats.find({
       $or: [
-        { senderId: userId, receiverId: mechanicId },
-        { senderId: mechanicId, receiverId: userId }
+        { senderId: userId, receiverId: userId },
+        { senderId: userId, receiverId: userId }
       ]
     }).sort({ timestamp: 1 });
     res.status(200).json(chatHistory);
