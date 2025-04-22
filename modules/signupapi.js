@@ -9,7 +9,6 @@ import nodemailer from 'nodemailer';
 import fetch from 'node-fetch';
 const router = express.Router();
 router.use(express.static("public"));
-
 const imagesDir = path.join("public", "images");
 if (!fs.existsSync(imagesDir)) {
   fs.mkdirSync(imagesDir, { recursive: true });
