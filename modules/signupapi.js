@@ -33,9 +33,9 @@ export default (io) => {
 
   router.post('/signup', upload.single("image"), validateSignup, async (req, res) => {
     try {
-      const { username, email, phone, date_of_birth, password, confirmpassword, country } = req.body;
+      const { username, email, phone, date_of_birth, password, confirmpassword, country,role } = req.body;
       const file = req.file;
-      if (!username || !email || !password || !date_of_birth || !confirmpassword || !country) {
+      if (!username || !email || !password || !date_of_birth || !confirmpassword || !country||!role) {
         return res.status(400).json({ message: "All fields are required." });
       }
       if (password !== confirmpassword) {

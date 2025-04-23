@@ -70,7 +70,18 @@ console.log('A user connected:', socket.id);
       io.to(room).emit('receive-message', { senderId, message });
       console.log(`Message sent to room ${room}: ${message}`);
     });
-  
+    socket.on("call-user", ({ to, offer }) => {
+      socket.to(to).emit("incoming-call", { from: socket.id, offer });
+    });
+    
+    socket.on("answer-call", ({ to, answer }) => {
+      socket.to(to).emit("call-answered", { from: socket.id, answer });
+    });
+    
+    socket.on("ice-candidate", ({ to, candidate }) => {
+      socket.to(to).emit("ice-candidate", { from: socket.id, candidate });
+    });
+    
     // Disconnect event
     socket.on('disconnect', () => {
       console.log('A user disconnected');

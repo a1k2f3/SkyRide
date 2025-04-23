@@ -9,7 +9,7 @@ import register from './modules/signupapi.js';
 import findusers from './modules/findusers.js';
 import userlocation from './modules/userlocation.js';
 import Chatroutes from './modules/chat/routes.js';
-
+import  AudioData from './modules/Audiofiles/audiorecorde.js';
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -22,25 +22,18 @@ app.use((req, res, next) => {
   req.io = io; // attach io to every request
   next();
 });
-
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
-
-// Initialize Connection
 Connection();
-
-// Use Routes
 app.use('/api', register(io)); // Make sure the register function is returning a router
 app.use('/api', login(io, onlineUsers)); // Make sure the login function is returning a router
 app.use('/api', findusers); // Ensure this also returns an Express router
 app.use('/api', userlocation(io)); // Same for userlocation
 app.use('/api', Chatroutes); // Ensure Chatroutes returns a router
-
-// Test Routes
+app.use('/api', AudioData); // Ensure Chatroutes returns a router
 app.get('/', (req, res) => res.send('Hello World!'));
-
 // Centralized Socket Logic
 setupSocket(io);
 
