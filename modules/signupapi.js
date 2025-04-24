@@ -77,7 +77,7 @@ export default (io) => {
         port: 465,
         auth: {
           user: process.env.EMAIL_USER,
-          pass: "kmev dssf mton xgdh"
+          pass: process.env,EMAIL_PASS,
         }
       });
 

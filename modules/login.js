@@ -24,9 +24,7 @@ router.post("/login", async (req, res) => {
       { expiresIn: '1h' } // Adjust the expiration time to something reasonable like 1 hour
     );
     res.status(200).json({ message: "User login successful",  user: existingUser, token, id:existingUser.id});
-    for(const [SockId,user] of onlineUsers.entries()
-    
-    ){
+    for(const [SockId,user] of onlineUsers.entries() ){
       if(user.email !== email){
         io.to(SockId).emit("user_logged_in", {
           id: existingUser.id,
@@ -35,7 +33,6 @@ router.post("/login", async (req, res) => {
         console.log("User logged in", user.email);
       }
     }
-
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ message: "Server error" });
@@ -50,7 +47,6 @@ router.put("/updateaccount/:id", async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required." });
     }
-
     const updateData = {
       ...(username && { username }),
       ...(email && { email }),
@@ -59,7 +55,6 @@ router.put("/updateaccount/:id", async (req, res) => {
       ...(phone && { phone }),
       ...(file && { image: file.filename }),
     };
-
     const updatedAccount = await Accounts.findOneAndUpdate(
       req.params.id,
       { $set: updateData },
@@ -75,7 +70,6 @@ router.put("/updateaccount/:id", async (req, res) => {
   }
 });
 router.get("/getaccount", async (req, res) => {
-  
   try {
     const { email } = req.body;
     const account = await Accounts.findOne({email});
