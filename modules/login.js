@@ -2,6 +2,9 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import Accounts from "../schema/user.js"; // Verify this path
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
+import fetch from "node-fetch";
+import crypto from "crypto";
 const router = express.Router();
 export default(io,onlineUsers)=>{
 router.post("/login", async (req, res) => {
@@ -88,6 +91,9 @@ router.put("/updatepassword", async (req, res) => {
     if (!password) {
       return res.status(400).json({ message: "Password is required." });
     }
+
+
+    
     const hashedPassword = await bcrypt.hash(password, 10);
     const updatedAccount = await Accounts.findOneAndUpdate(
       {email},

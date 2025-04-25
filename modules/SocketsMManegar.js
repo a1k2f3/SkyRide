@@ -1,5 +1,4 @@
 const onlineUsers = new Map();
-
 export default function setupSocket(io) {
   io.on("connection", (socket) => {
     console.log("🔌 New client connected:", socket.id);
@@ -87,9 +86,5 @@ console.log('A user connected:', socket.id);
       console.log('A user disconnected');
     });
   })
- 
 }
-
-
-
 export { onlineUsers };
