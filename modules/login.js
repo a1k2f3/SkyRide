@@ -91,15 +91,46 @@ router.put("/updatepassword", async (req, res) => {
     if (!password) {
       return res.status(400).json({ message: "Password is required." });
     }
-
-
-    
     const hashedPassword = await bcrypt.hash(password, 10);
-    const updatedAccount = await Accounts.findOneAndUpdate(
-      {email},
-      { password: hashedPassword },
-      { new: true }
-    );
+    
+// Generate token and save user temporarily
+const token = crypto.randomBytes(32).toString("hex");
+pendingUsers.set(token, {
+  email,
+  password: hashedPassword,
+});
+
+// Optional: Remove token after 15 mins
+setTimeout(() => pendingUsers.delete(token), 15 * 60 * 1000);
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  secure: true,
+  port: 465,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  }
+});
+const mailOptions = {
+  from: process.env.EMAIL_USER,
+  to: email,
+  subject: "Email Verification - Confirm Your Account",
+  html: `
+    <h2>Hi ${email},</h2>
+    <p>Please click the button below to verify your email and update your password your account:</p>
+    <a href="http://localhost:3000/api/verify/updatepassword?token=${token}" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none;">Verify Email</a>
+    <p>If you did not request this, please ignore.</p>
+  `
+};
+transporter.sendMail(mailOptions, (err, info) => {
+  if (err) {
+    console.error("Email failed to send:", err);
+    return res.status(400).json({ message: "Email verification failed to send." });
+  }
+  res.status(200).json({ message: "Verification email sent. Please check your inbox and verify its you." });
+});
+
     if (!updatedAccount) {
       return res.status(404).json({ message: "Account not found." });
     }
@@ -109,6 +140,38 @@ router.put("/updatepassword", async (req, res) => {
     res.status(500).json({ message: "Server error." });
   }
 });
+
+router.get('/verify/updatepassword', async (req, res) => {
+  const token = req.query.token;
+  const userData = pendingUsers.get(token);
+
+  if (!userData) {
+    return res.status(400).send("Invalid or expired token.");
+  }
+
+  try {
+    const existingUser = await Accounts.findOne({ email: userData.email });
+    if (!existingUser) {
+      return res.status(400).send("your email not found.");
+    }
+
+    
+    const updatedAccount = await Accounts.findOneAndUpdate(
+      {email},
+      { password: hashedPassword },
+      { new: true }
+    );
+    await updatedAccount.save();
+    pendingUsers.delete(token);
+
+    io.emit("user update password correctly", { email: userData.email, name: userData.username });
+
+    res.send("✅ Your password has been updated successfully!");
+  } catch (error) {
+    console.error("Error in verification:", error);
+    res.status(500).send("Internal server error.");
+  }
+})
 router.delete("/deleteaccount/:id", async (req, res)  => {
   try {
     const { id } = req.params;
