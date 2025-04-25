@@ -5,19 +5,72 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import fetch from "node-fetch";
 import crypto from "crypto";
+import user from "../schema/user.js";
 const router = express.Router();
 export default(io,onlineUsers)=>{
+  const pendinglogin = new Map(); 
 router.post("/login", async (req, res) => {
   try { 
     const { email,password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required." });
     }
-    const existingUser = await Accounts.findOne({ email });
+    const logintoken = crypto.randomBytes(32).toString("hex");
+    pendinglogin.set(logintoken, {
+      email,
+      password: password,
+    });
+    
+    // Optional: Remove token after 15 mins
+    setTimeout(() => pendinglogin.delete(logintoken), 15 * 60 * 1000);
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      secure: true,
+      port: 465,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      }
+    });
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Email Verification - Confirm Your Login",
+      html: `
+        <h2>Hi ${email},</h2>
+        <p>Please click the button below to verify your email and update your password your account:</p>
+        <a href="http://localhost:3000/api/verify/login?token=${logintoken}" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none;">Verify Email</a>
+        <p>If you did not request this, please ignore.</p>
+      `
+    };
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error("Email failed to send:", err);
+        return res.status(400).json({ message: "Email verification failed to send." });
+      }
+      res.status(200).json({ message: "Verification email sent. Please check your inbox and verify its you." });
+    });
+    
+
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+router.get('/verify/login', async (req, res) => {
+
+  const verifytoken = req.query.token;
+  const userData = pendinglogin.get(verifytoken);
+
+  if (!userData) {
+    return res.status(400).send("Invalid or expired token.");
+  }
+
+  const existingUser = await Accounts.findOne({ email: userData.email });
     if (!existingUser) {
       return res.status(400).send("Invalid email or password");
     }
-    const validation = await bcrypt.compare(password,existingUser.password);
+    const validation = await bcrypt.compare(userData.password,existingUser.password);
     if (!validation) {
       return res.status(400).send("Invalid email or password");
     }
@@ -36,11 +89,8 @@ router.post("/login", async (req, res) => {
         console.log("User logged in", user.email);
       }
     }
-  } catch (error) {
-    console.error("Error during login:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
+})
+const pendingUsers = new Map(); 
 router.put("/updateaccount/:id", async (req, res) => {
   try {
     const { username, email, password, role,phone } = req.body;
@@ -131,10 +181,6 @@ transporter.sendMail(mailOptions, (err, info) => {
   res.status(200).json({ message: "Verification email sent. Please check your inbox and verify its you." });
 });
 
-    if (!updatedAccount) {
-      return res.status(404).json({ message: "Account not found." });
-    }
-    res.status(200).json({ message: "Password updated successfully." });
   } catch (error) {
     console.error("Update error:", error);
     res.status(500).json({ message: "Server error." });
@@ -157,8 +203,8 @@ router.get('/verify/updatepassword', async (req, res) => {
 
     
     const updatedAccount = await Accounts.findOneAndUpdate(
-      {email},
-      { password: hashedPassword },
+     {email:userData.email},
+      { password: userData.password },
       { new: true }
     );
     await updatedAccount.save();
