@@ -15,19 +15,34 @@ router.post("/login", async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required." });
     }
-    const logintoken = crypto.randomBytes(32).toString("hex");
-    pendinglogin.set(logintoken, {
-      email,
-      password: password,
-    });
-    
-    // Optional: Remove token after 15 mins
-    setTimeout(() => pendinglogin.delete(logintoken), 15 * 60 * 1000);
-    const transporter = nodemailer.createTransport({
+    const existingUser = await Accounts.findOne({ email: email });
+  if (!existingUser) {
+    return res.status(400).send("Invalid email or password");
+  }
+  const validation = await bcrypt.compare(password,existingUser.password);
+  if (!validation) {
+    return res.status(400).send("Invalid email or password");
+  }
+  const token = jwt.sign(
+    { id: existingUser._id, email: existingUser.email },
+    process.env.JWT_SECRET || "your_jwt_secret", // Replace with your secret
+    { expiresIn: '1h' } // Adjust the expiration time to something reasonable like 1 hour
+  );
+  res.status(200).json({ message: "User login successful",  user: existingUser, token, id:existingUser.id});
+  for(const [SockId,user] of onlineUsers.entries() ){
+    if(user.email !== email){
+      io.to(SockId).emit("user_logged_in", {
+        id: existingUser.id,
+        email: existingUser.email,
+      });
+      console.log("User logged in", user.email);
+    }
+  }
+const transporter = nodemailer.createTransport({
       service: "gmail",
       secure: true,
       port: 465,
-      auth: {
+      auth : {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       }
@@ -35,12 +50,11 @@ router.post("/login", async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "Email Verification - Confirm Your Login",
+      subject: " Your have  Login to your acount",
       html: `
         <h2>Hi ${email},</h2>
-        <p>Please click the button below to verify your email and update your password your account:</p>
-        <a href="http://localhost:3000/api/verify/login?token=${logintoken}" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none;">Verify Email</a>
-        <p>If you did not request this, please ignore.</p>
+        <p> you login to your acount</p>
+       
       `
     };
     transporter.sendMail(mailOptions, (err, info) => {
@@ -51,7 +65,7 @@ router.post("/login", async (req, res) => {
       res.status(200).json({ message: "Verification email sent. Please check your inbox and verify its you." });
     });
     
-
+  
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ message: "Server error" });
@@ -59,36 +73,12 @@ router.post("/login", async (req, res) => {
 });
 router.get('/verify/login', async (req, res) => {
 
-  const verifytoken = req.query.token;
-  const userData = pendinglogin.get(verifytoken);
+ 
 
   if (!userData) {
     return res.status(400).send("Invalid or expired token.");
   }
 
-  const existingUser = await Accounts.findOne({ email: userData.email });
-    if (!existingUser) {
-      return res.status(400).send("Invalid email or password");
-    }
-    const validation = await bcrypt.compare(userData.password,existingUser.password);
-    if (!validation) {
-      return res.status(400).send("Invalid email or password");
-    }
-    const token = jwt.sign(
-      { id: existingUser._id, email: existingUser.email },
-      process.env.JWT_SECRET || "your_jwt_secret", // Replace with your secret
-      { expiresIn: '1h' } // Adjust the expiration time to something reasonable like 1 hour
-    );
-    res.status(200).json({ message: "User login successful",  user: existingUser, token, id:existingUser.id});
-    for(const [SockId,user] of onlineUsers.entries() ){
-      if(user.email !== email){
-        io.to(SockId).emit("user_logged_in", {
-          id: existingUser.id,
-          email: existingUser.email,
-        });
-        console.log("User logged in", user.email);
-      }
-    }
 })
 const pendingUsers = new Map(); 
 router.put("/updateaccount/:id", async (req, res) => {

@@ -2,9 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import fs from 'fs';
 import AudioCall from '../../schema/AudioCall.js'; // adjust path as needed
-
 const router = express.Router();
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = './uploads/audio';
@@ -15,9 +13,7 @@ const storage = multer.diskStorage({
     cb(null, `call-${Date.now()}.webm`);
   }
 });
-
 const upload = multer({ storage });
-
 router.post('/save-audio', upload.single('audio'), async (req, res) => {
   const { senderId, receiverId } = req.body;
 
@@ -31,7 +27,6 @@ router.post('/save-audio', upload.single('audio'), async (req, res) => {
       receiverId,
       filePath: req.file.path,
     });
-
     await newAudio.save();
     res.status(200).json({ message: "Audio saved", data: newAudio });
 
