@@ -1,7 +1,7 @@
 import express from "express";
 import Location from "../schema/locationschems.js"; // ✅ Your model
 const router = express.Router();
-
+import mongoose from "mongoose";
 export default (io) => {
   // POST: Share Location
   router.post("/location", async (req, res) => {
