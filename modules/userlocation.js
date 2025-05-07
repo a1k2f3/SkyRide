@@ -11,9 +11,15 @@ export default (io) => {
     }
   try {
       // Add timestamp if necessary (ensure the schema handles it)
-      const newLocation = new Location({ senderId, latitude, longitude, timestamp: new Date() });
-      await newLocation.save();
+      const objectId = new mongoose.Types.ObjectId(senderId); // Convert to ObjectId
 
+      const newLocation = new Location({
+        senderId: objectId,
+        latitude,
+        longitude,
+        timestamp: new Date()
+      });
+      await newLocation.save();
       // Emit real-time location to followers
       io.to(`follow-${senderId}`).emit("location-update", {
         senderId,

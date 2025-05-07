@@ -150,7 +150,7 @@ const mailOptions = {
   html: `
     <h2>Hi ${email},</h2>
     <p>Please click the button below to verify your email and update your password your account:</p>
-    <a href="http://localhost:3000/api/verify/updatepassword?token=${token}" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none;">Verify Email</a>
+    <a href="https://skyride.onrender/api/verify/updatepassword?token=${token}" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none;">Verify Email</a>
     <p>If you did not request this, please ignore.</p>
   `
 };
