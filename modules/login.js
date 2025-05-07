@@ -71,15 +71,6 @@ const transporter = nodemailer.createTransport({
     res.status(500).json({ message: "Server error" });
   }
 });
-router.get('/verify/login', async (req, res) => {
-
- 
-
-  if (!userData) {
-    return res.status(400).send("Invalid or expired token.");
-  }
-
-})
 const pendingUsers = new Map(); 
 router.put("/updateaccount/:id", async (req, res) => {
   try {
