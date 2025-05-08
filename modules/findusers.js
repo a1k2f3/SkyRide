@@ -38,7 +38,7 @@ router.get("/alluser", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch users" });
   }
 });
-router.get("/get-mechanic-and-fuel", async (req, res) => {
+router.get("/getmechanicfuel", async (req, res) => {
   try {
     const users = await Accounts.find(
       { role: { $in: ["mechanic", "fuel pump"] } },
