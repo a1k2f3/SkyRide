@@ -94,10 +94,11 @@ router.put("/updateaccount/:id", async (req, res) => {
     };
 
     const updatedAccount = await Accounts.findOneAndUpdate(
-      req.params.id,
+      { _id: req.params.id },   // ✅ Correct: pass filter as an object
       { $set: updateData },
       { new: true }
     );
+    
 
     if (!updatedAccount) {
       return res.status(404).json({ message: "Account not found." });
