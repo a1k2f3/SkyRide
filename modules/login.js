@@ -6,6 +6,7 @@ import nodemailer from "nodemailer";
 import fetch from "node-fetch";
 import crypto from "crypto";
 import user from "../schema/user.js";
+import mongoose from "mongoose"; // Import mongoose
 const router = express.Router();
 export default(io,onlineUsers)=>{
   const pendinglogin = new Map(); 
@@ -109,17 +110,24 @@ router.put("/updateaccount/:id", async (req, res) => {
   }
 });
 
-router.get("/getaccount", async (req, res) => {
+router.get("/getaccount/:id", async (req, res) => {
+  const { id } = req.params;
+  // Validate ID format
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ success: false, message: "Invalid account ID." });
+  }
+
   try {
-    const { email } = req.body;
-    const account = await Accounts.findOne({email});
+    const account = await Accounts.findById(id);
+
     if (!account) {
-      return res.status(404).json({ message: "Account not found." });
+      return res.status(404).json({ success: false, message: "Account not found." });
     }
-    res.status(200).json({ account });
+
+    res.status(200).json({ success: true, data: account });
   } catch (error) {
     console.error("Fetch error:", error);
-    res.status(500).json({ message: "Server error." });
+    res.status(500).json({ success: false, message: "Internal server error." });
   }
 });
 router.put("/updatepassword", async (req, res) => {
