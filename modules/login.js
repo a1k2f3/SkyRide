@@ -74,35 +74,41 @@ const transporter = nodemailer.createTransport({
 const pendingUsers = new Map(); 
 router.put("/updateaccount/:id", async (req, res) => {
   try {
-    const { username, email, password, role,phone } = req.body;
+    const { username, email, password, role, phone, location } = req.body;
     const file = req.file; // assuming you're using multer
 
     // Basic validation
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required." });
     }
+
     const updateData = {
       ...(username && { username }),
       ...(email && { email }),
       ...(password && { password }),
       ...(role && { role }),
       ...(phone && { phone }),
+      ...(location && { location }), // Added location here
       ...(file && { image: file.filename }),
     };
+
     const updatedAccount = await Accounts.findOneAndUpdate(
       req.params.id,
       { $set: updateData },
       { new: true }
     );
+
     if (!updatedAccount) {
       return res.status(404).json({ message: "Account not found." });
     }
+
     res.status(200).json({ message: "Account updated successfully.", account: updatedAccount });
   } catch (error) {
     console.error("Update error:", error);
     res.status(500).json({ message: "Server error." });
   }
 });
+
 router.get("/getaccount", async (req, res) => {
   try {
     const { email } = req.body;
@@ -130,10 +136,8 @@ pendingUsers.set(token, {
   email,
   password: hashedPassword,
 });
-
 // Optional: Remove token after 15 mins
 setTimeout(() => pendingUsers.delete(token), 15 * 60 * 1000);
-
 const transporter = nodemailer.createTransport({
   service: "gmail",
   secure: true,
