@@ -8,6 +8,8 @@ import crypto from "crypto";
 import user from "../schema/user.js";
 import mongoose from "mongoose"; // Import mongoose
 import multer from 'multer';
+import path from "path";
+import fs from "fs";
 const router = express.Router();
 export default(io,onlineUsers)=>{
   const pendinglogin = new Map(); 
@@ -74,9 +76,17 @@ const transporter = nodemailer.createTransport({
   }
 });
 const pendingUsers = new Map(); 
+
+router.use(express.static("public"));
+
+const imagesDir = path.join("public", "images");
+if (!fs.existsSync(imagesDir)) {
+  fs.mkdirSync(imagesDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Or your desired path
+    cb(null, imagesDir); // Or your desired path
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + file.originalname);
