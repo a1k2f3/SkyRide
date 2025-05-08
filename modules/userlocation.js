@@ -44,6 +44,6 @@ export default (io) => {
       res.status(500).json({ error: "Error fetching location" });
     }
   });
-
+  // Get machnic and fule
   return router;
 };

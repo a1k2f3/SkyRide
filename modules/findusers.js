@@ -40,5 +40,24 @@ router.get("/alluser", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch users" });
   }
 });
+router.get("/get-mechanic-and-fuel", async (req, res) => {
+  try {
+    const users = await Accounts.find(
+      { role: { $in: ["mechanic", "fuel pump"] } },
+      { username: 1, role: 1, location: 1, phone: 1, email: 1, _id: 1 } // Only return selected fields
+    );
+
+    if (!users.length) {
+      return res.status(404).json({ message: "No mechanic or fuel users found." });
+    }
+
+    res.status(200).json({ message: "Users fetched successfully.", users });
+  } catch (error) {
+    console.error("Fetch error:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+
 
 export default router;
