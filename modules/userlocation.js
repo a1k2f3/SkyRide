@@ -1,5 +1,6 @@
 import express from "express";
 import Location from "../schema/locationschems.js"; // ✅ Your model
+import mongoose from "mongoose";
 const router = express.Router();
 
 export default (io) => {
@@ -8,6 +9,9 @@ export default (io) => {
     const { senderId, latitude, longitude } = req.body;
     if (!senderId || !latitude || !longitude) {
       return res.status(400).json({ error: "Missing required fields" });
+    }
+    if (!mongoose.Types.ObjectId.isValid(senderId)) {
+      return res.status(400).json({ success: false, message: "Invalid account ID." });
     }
   try {
       // Add timestamp if necessary (ensure the schema handles it)

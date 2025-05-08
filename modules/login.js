@@ -77,7 +77,7 @@ router.put("/updateaccount/:id", async (req, res) => {
   try {
     const { username, email, password, role, phone, location } = req.body;
     const file = req.file; // assuming you're using multer
-
+    
     // Basic validation
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required." });
