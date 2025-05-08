@@ -41,7 +41,7 @@ router.get("/alluser", async (req, res) => {
 router.get("/getmechanicfuel", async (req, res) => {
   try {
     const users = await Accounts.find(
-      { role: { $in: ["mechanic", "fuelpump"] } },
+      { role: { $in: ["machanic", "fuelpump"] } },
       { username: 1, role: 1, location: 1, phone: 1, email: 1, _id: 1 } // Only return selected fields
     );
     if (!users.length) {
