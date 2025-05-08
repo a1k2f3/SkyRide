@@ -23,12 +23,10 @@ router.get("/alluser", async (req, res) => {
       .limit(limitNumber)
       .sort({ createdAt: -1 }) // Sort by createdAt field in descending order
       .select("-password"); // Exclude password field
-
     // Get the total count of documents
     const count = await mongoose.connection.db
       .collection("Accounts")
       .countDocuments();
-
     // Send the response
     res.json({
       data,
@@ -46,11 +44,9 @@ router.get("/get-mechanic-and-fuel", async (req, res) => {
       { role: { $in: ["mechanic", "fuel pump"] } },
       { username: 1, role: 1, location: 1, phone: 1, email: 1, _id: 1 } // Only return selected fields
     );
-
     if (!users.length) {
       return res.status(404).json({ message: "No mechanic or fuel users found." });
     }
-
     res.status(200).json({ message: "Users fetched successfully.", users });
   } catch (error) {
     console.error("Fetch error:", error);
