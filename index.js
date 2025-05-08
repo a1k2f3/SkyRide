@@ -26,9 +26,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
+app.use(express.urlencoded({ extended: true })); 
 Connection();
-app.use('/api', register(io)); // Make sure the register function is returning a router
-app.use('/api', login(io, onlineUsers)); // Make sure the login function is returning a router
+app.use('/api', register(io),express.static('public')); // Make sure the register function is returning a router
+app.use('/api', login(io, onlineUsers),express.static('public')); // Make sure the login function is returning a router
 app.use('/api', findusers); // Ensure this also returns an Express router
 app.use('/api', userlocation(io)); // Same for userlocation
 app.use('/api', Chatroutes); // Ensure Chatroutes returns a router

@@ -7,6 +7,7 @@ import fetch from "node-fetch";
 import crypto from "crypto";
 import user from "../schema/user.js";
 import mongoose from "mongoose"; // Import mongoose
+import multer from 'multer';
 const router = express.Router();
 export default(io,onlineUsers)=>{
   const pendinglogin = new Map(); 
@@ -73,14 +74,25 @@ const transporter = nodemailer.createTransport({
   }
 });
 const pendingUsers = new Map(); 
-router.put("/updateaccount/:id", async (req, res) => {
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Or your desired path
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+const upload = multer({ storage });
+router.put("/updateaccount/:id", upload.single("image"), async (req, res) => {
   try {
-    const { username, email, password, role, phone, location } = req.body;
-    const file = req.file; // assuming you're using multer
-    
-    // Basic validation
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required." });
+    const { username, email, password, role, phone } = req.body;
+    const file = req.file;
+
+    // Handle location as a GeoJSON Point (expects JSON string from frontend)
+    let location = undefined;
+    if (req.body.location) {
+      const loc = JSON.parse(req.body.location); // Example: { "type": "Point", "coordinates": [74.3587, 31.5204] }
+      location = loc;
     }
 
     const updateData = {
@@ -89,16 +101,15 @@ router.put("/updateaccount/:id", async (req, res) => {
       ...(password && { password }),
       ...(role && { role }),
       ...(phone && { phone }),
-      ...(location && { location }), // Added location here
+      ...(location && { location }),
       ...(file && { image: file.filename }),
     };
 
-    const updatedAccount = await Accounts.findOneAndUpdate(
-      { _id: req.params.id },   // ✅ Correct: pass filter as an object
+    const updatedAccount = await Accounts.findByIdAndUpdate(
+      req.params.id,
       { $set: updateData },
       { new: true }
     );
-    
 
     if (!updatedAccount) {
       return res.status(404).json({ message: "Account not found." });
@@ -107,9 +118,10 @@ router.put("/updateaccount/:id", async (req, res) => {
     res.status(200).json({ message: "Account updated successfully.", account: updatedAccount });
   } catch (error) {
     console.error("Update error:", error);
-    res.status(500).json({ message: "Server error." });
+    res.status(500).json({ message: "Server error.", error: error.message });
   }
 });
+
 
 router.get("/getaccount/:id", async (req, res) => {
   const { id } = req.params;
