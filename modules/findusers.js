@@ -40,27 +40,20 @@ router.get("/alluser", async (req, res) => {
 });
 router.get("/getmechanicfuel", async (req, res) => {
   try {
-    const { role } = req.query;
-
-    // Validate role
-    const allowedRoles = ["mechanic", "fuelpump"];
-    if (!role || !allowedRoles.includes(role)) {
-      return res.status(400).json({ message: "Invalid or missing role. Must be 'mechanic' or 'fuel pump'." });
-    }
-
     const users = await Accounts.find(
-      { role },
-      { username: 1, role: 1, location: 1, phone: 1, email: 1, _id: 1 }
+      { role: { $in: ["mechanic", "fuelpump"] } },
+      { username: 1, role: 1, location: 1, phone: 1, email: 1, _id: 1 } // Only return selected fields
     );
-
     if (!users.length) {
-      return res.status(404).json({ message: `No users found with role: ${role}` });
+      return res.status(404).json({ message: "No mechanic or fuel users found." });
     }
-
-    res.status(200).json({ message: `Users with role '${role}' fetched successfully.`, users });
+    res.status(200).json({ message: "Users fetched successfully.", users });
   } catch (error) {
     console.error("Fetch error:", error);
     res.status(500).json({ message: "Server error." });
   }
 });
+
+
+
 export default router;
