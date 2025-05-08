@@ -43,7 +43,7 @@ router.get("/getmechanicfuel", async (req, res) => {
     const { role } = req.query;
 
     // Validate role
-    const allowedRoles = ["mechanic", "fuel pump"];
+    const allowedRoles = ["mechanic", "fuelpump"];
     if (!role || !allowedRoles.includes(role)) {
       return res.status(400).json({ message: "Invalid or missing role. Must be 'mechanic' or 'fuel pump'." });
     }

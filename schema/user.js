@@ -10,7 +10,7 @@ const SignupSchema = new Schema({
   country: { type: String },
   image: { type: String },
   Userbio: { type: String },
-  role: {type: String, enum: ["machanic", "user","fuel pump"], default: "user"},
+  role: {type: String, enum: ["machanic", "user","fuelpump"], default: "user"},
   location: {
     type: {
       type: String,
