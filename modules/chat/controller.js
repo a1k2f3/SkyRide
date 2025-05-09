@@ -1,23 +1,35 @@
 // import Message from '../models/Message.mjs';
 import Chats from "../../schema/chat.js";
 // Send a message from user to mechanic
+
 export const sendMessage = async (req, res) => {
-  const { senderId, receiverId, message, role } = req.body;
+
+  const { senderId, receiverId, message, role, location } = req.body;
+  const image = req.file ? `/chat/images/${req.file.filename}` : null;
 
   if (!senderId || !receiverId || !message || !role) {
     return res.status(400).json({ success: false, error: 'Missing required fields' });
   }
 
   try {
-    const newMessage = new Chats({ senderId, receiverId, message, role });
+    const newMessage = new Chats({
+      senderId,
+      receiverId,
+      message,
+      role,
+      location,
+      image,
+    });
+
     await newMessage.save();
 
-    // Create a consistent room ID (order-independent)
     const roomId = [senderId, receiverId].sort().join("-");
     req.io.to(`room-${roomId}`).emit('receive-message', {
       senderId,
       receiverId,
       message,
+      location,
+      image,
       timestamp: newMessage.createdAt,
     });
 
@@ -27,6 +39,7 @@ export const sendMessage = async (req, res) => {
     res.status(500).json({ success: false, error: 'Failed to send message' });
   }
 };
+
 export const getChatHistory = async (req, res) => {
   const { userId, userId2, page = 1, limit = 20 } = req.query;
 

@@ -13,7 +13,20 @@ const messageSchema = new mongoose.Schema({
       },
     message: String,
     role: { type: String,required: true }, //
-    timestamp: { type: Date, default: Date.now }
+    timestamp: { type: Date, default: Date.now },
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number],
+        index: "2dsphere",
+      },
+    },
+    image: { type: String },
+
   });
   const Chats = mongoose.model('chats', messageSchema);
 export default Chats;

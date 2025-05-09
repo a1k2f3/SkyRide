@@ -26,6 +26,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+app.use(express.static('chat'));
 
 app.use(express.urlencoded({ extended: true })); 
 Connection();
@@ -33,7 +34,7 @@ app.use('/api', register(io),express.static('public')); // Make sure the registe
 app.use('/api', login(io, onlineUsers),express.static('public')); // Make sure the login function is returning a router
 app.use('/api', findusers); // Ensure this also returns an Express router
 app.use('/api', userlocation(io)); // Same for userlocation
-app.use('/api', Chatroutes); // Ensure Chatroutes returns a router
+app.use('/api', Chatroutes,express.static('chat')); // Ensure Chatroutes returns a router
 app.use('/api', AudioData); // Ensure Chatroutes returns a router
 app.get('/', (req, res) => res.send('Hello World!'));
 // Centralized Socket Logic
