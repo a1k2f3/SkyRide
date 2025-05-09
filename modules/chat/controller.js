@@ -7,7 +7,7 @@ export const sendMessage = async (req, res) => {
   const { senderId, receiverId, message, role, location } = req.body;
   const image = req.file ? `/chat/images/${req.file.filename}` : null;
 
-  if (!senderId || !receiverId || !message || !role) {
+  if (!senderId || !receiverId || !role ||!location) {
     return res.status(400).json({ success: false, error: 'Missing required fields' });
   }
 

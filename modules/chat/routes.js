@@ -24,11 +24,10 @@ const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) cb(null, true);
   else cb(new Error('Only image files are allowed'), false);
 };
-
-export const upload = multer({ storage, fileFilter });
+const upload = multer({ storage, fileFilter });
 
 // POST: Send a message
-router.post('/send', sendMessage,upload.single("image"));
+router.post('/send',upload.single("image"), sendMessage);
 
 // GET: Fetch chat history
 router.get('/history', getChatHistory);
