@@ -20,15 +20,10 @@ const storage = multer.diskStorage({
   }
 });
 
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) cb(null, true);
-  else cb(new Error('Only image files are allowed'), false);
-};
-const upload = multer({ storage, fileFilter });
 
+const upload = multer({ storage});
 // POST: Send a message
-router.post('/send',upload.single("image"), sendMessage);
-
+router.post('/send',upload.single("image"),sendMessage);
 // GET: Fetch chat history
 router.get('/history', getChatHistory);
 

@@ -1,16 +1,13 @@
 // import Message from '../models/Message.mjs';
 import Chats from "../../schema/chat.js";
 // Send a message from user to mechanic
-
+import path from "path";
 export const sendMessage = async (req, res) => {
-
-  const { senderId, receiverId, message, role, location } = req.body;
-  const image = req.file ? `/chat/images/${req.file.filename}` : null;
-
-  if (!senderId || !receiverId || !role ||!location) {
+  const { senderId,receiverId,message,role,location } = req.body;
+  const image = req.file?.path.replace(/\\/g, "/"); // Normalize the path for cross-platform compatibility
+  if (!senderId || !receiverId|| !message ) {
     return res.status(400).json({ success: false, error: 'Missing required fields' });
   }
-
   try {
     const newMessage = new Chats({
       senderId,
@@ -20,9 +17,7 @@ export const sendMessage = async (req, res) => {
       location,
       image,
     });
-
     await newMessage.save();
-
     const roomId = [senderId, receiverId].sort().join("-");
     req.io.to(`room-${roomId}`).emit('receive-message', {
       senderId,
@@ -32,23 +27,18 @@ export const sendMessage = async (req, res) => {
       image,
       timestamp: newMessage.createdAt,
     });
-
     res.status(201).json({ success: true, data: newMessage });
   } catch (error) {
     console.error("❌ Error sending message:", error.message);
     res.status(500).json({ success: false, error: 'Failed to send message' });
   }
 };
-
 export const getChatHistory = async (req, res) => {
   const { userId, userId2, page = 1, limit = 20 } = req.query;
-
-  if (!userId || !userId2) {
+  if (!userId || !userId2) {  
     return res.status(400).json({ success: false, error: 'User IDs are required' });
   }
-
   const skip = (parseInt(page) - 1) * parseInt(limit);
-
   try {
     const messages = await Chats.find({
       $or: [
