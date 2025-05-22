@@ -5,9 +5,10 @@ import path from "path";
 export const sendMessage = async (req, res) => {
   const { senderId,receiverId,message,role,location } = req.body;
   const image = req.file?.path.replace(/\\/g, "/"); // Normalize the path for cross-platform compatibility
-  if (!senderId || !receiverId|| !message ) {
+  if (!senderId || !receiverId || !message || !role || !location) {
     return res.status(400).json({ success: false, error: 'Missing required fields' });
   }
+  
   try {
     const newMessage = new Chats({
       senderId,
