@@ -10,6 +10,7 @@ import findusers from './modules/findusers.js';
 import userlocation from './modules/userlocation.js';
 import Chatroutes from './modules/chat/routes.js';
 import  AudioData from './modules/Audiofiles/audiorecorde.js';
+import  bookingReqquest from './modules/requestmodule/customerrequest.js'; // Adjust the path as needed
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -36,6 +37,7 @@ app.use('/api', findusers); // Ensure this also returns an Express router
 app.use('/api', userlocation(io)); // Same for userlocation
 app.use('/api', Chatroutes,express.static('chat')); // Ensure Chatroutes returns a router
 app.use('/api', AudioData); // Ensure Chatroutes returns a router
+app.use('/api', bookingReqquest); // Ensure Chatroutes returns a router
 app.get('/', (req, res) => res.send('Hello World!'));
 // Centralized Socket Logic
 setupSocket(io);
