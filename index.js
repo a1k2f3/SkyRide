@@ -30,7 +30,7 @@ app.use(express.static('public'));
 app.use(express.static('chat'));
 
 app.use(express.urlencoded({ extended: true })); 
-Connection();
+ 
 app.use('/api', register(io),express.static('public')); // Make sure the register function is returning a router
 app.use('/api', login(io, onlineUsers),express.static('public')); // Make sure the login function is returning a router
 app.use('/api', findusers); // Ensure this also returns an Express router
